@@ -2,7 +2,8 @@ package Kelly.Clinic.controller;
 
 import java.util.List;
 import java.util.UUID;
-
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import Kelly.Clinic.model.Doctor;
 import Kelly.Clinic.model.Office;
-import org.springframework.web.bind.annotation.PathVariable;
+
 import Kelly.Clinic.service.DoctorService;
 
 @RestController 
@@ -86,4 +87,16 @@ public ResponseEntity<String> removeSpecializationFromDoctor(
        List<Doctor> displayAll=doctorService.displayAllDoctor();
        return new ResponseEntity<>(displayAll,HttpStatus.CREATED);
  }
+
+  @PatchMapping("/{doctorId}/office")
+   public ResponseEntity<String> moveDoctorToOffice(
+        @PathVariable UUID doctorId,
+        @RequestParam int officeNumber) {
+
+            System.out.println("PATCH endpoint reached!");
+    System.out.println("Doctor ID: " + doctorId);
+    System.out.println("Office number: " + officeNumber);
+    return doctorService.moveDoctorToOffice(doctorId, officeNumber);
+}
+
 }

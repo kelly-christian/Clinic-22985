@@ -2,7 +2,6 @@ package Kelly.Clinic.controller;
 
 import java.util.List;
 
-import javax.swing.Spring;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -66,6 +65,9 @@ public class OfficeController {
     public ResponseEntity<List<Office>> getFreeOffices() {
     List<Office> freeOffices = officeService.getFreeOffices();
     return ResponseEntity.ok(freeOffices);
+
 }
-    
+
+ 
+
 }

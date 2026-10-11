@@ -211,6 +211,52 @@ public ResponseEntity<String> removeSpecializationFromDoctor(
 }
 
 
+  @Transactional
+  public ResponseEntity<String> moveDoctorToOffice(
+        UUID doctorId, int officeNumber) {
+
+  
+    Optional<Doctor> doctorOptional =
+            doctorRepo.findById(doctorId);
+
+    if (doctorOptional.isEmpty()) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body("The doctor with that id does not exist");
+    }
+
+    
+    Optional<Office> officeOptional =
+            officeRepo.findByOfficeNumber(officeNumber);
+
+    if (officeOptional.isEmpty()) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body("The office with that office number does not exist");
+    }
+
+    Doctor doctor = doctorOptional.get();
+    Office newOffice = officeOptional.get();
+
+   
+    if (officeRepo.existsByOfficeNumberAndDoctorIsNotNull(officeNumber)) {
+        if (doctor.getOffice() == null ||
+                !doctor.getOffice().getOfficeId()
+                        .equals(newOffice.getOfficeId())) {
+
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body("That office is taken by other doctor");
+        }
+    }
+
+    
+    doctor.setOffice(newOffice);
+    doctorRepo.save(doctor);
+
+   
+    return ResponseEntity.ok("Office changed successfully");
+}
+
+
+
           public String deleteDoctor(UUID doctorId){
 
             Optional<Doctor> doctorO=doctorRepo.findById(doctorId);

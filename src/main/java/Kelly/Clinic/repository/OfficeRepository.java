@@ -17,6 +17,7 @@ List<Office> findByOfficeName(String officeName);
 Optional<Office> findByOfficeNumber(int officeNumber);
 Optional<Office> findByOfficeNameAndOfficeNumber(String officeName,int officeNumber);
 Optional<Office> findByDoctor(Doctor doctor);
+boolean existsByOfficeNumberAndDoctorIsNotNull(int officeNumber);
 
 @Query("SELECT o FROM Office o " +
        "WHERE o.doctor IS NULL " +
