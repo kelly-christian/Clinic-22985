@@ -57,6 +57,15 @@ public ResponseEntity<String> addSpecializationToDoctor(
             doctorId, specializationId);
 }
 
+@DeleteMapping("/removeSpecialization")
+public ResponseEntity<String> removeSpecializationFromDoctor(
+        @RequestParam UUID doctorId,
+        @RequestParam UUID specializationId) {
+
+    return doctorService.removeSpecializationFromDoctor(
+            doctorId, specializationId);
+}
+
 
   @DeleteMapping (value = "/delete", consumes = MediaType.APPLICATION_JSON_VALUE,
     produces = MediaType.APPLICATION_JSON_VALUE

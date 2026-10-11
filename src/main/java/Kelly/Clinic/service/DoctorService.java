@@ -162,6 +162,55 @@ public class DoctorService {
             "Specialization added to the doctor");
 }
 
+@Transactional
+public ResponseEntity<String> removeSpecializationFromDoctor(
+        UUID doctorId, UUID specializationId) {
+
+    // 1. Find the doctor
+    Optional<Doctor> doctorOptional =
+            doctorRepo.findById(doctorId);
+
+    if (doctorOptional.isEmpty()) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body("The doctor with that id does not exist");
+    }
+
+    Doctor doctor = doctorOptional.get();
+
+    // 2. Find the specialization
+    Optional<Specialization> specializationOptional =
+            specializationRepo.findById(specializationId);
+
+    if (specializationOptional.isEmpty()) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body("That specialization does not exist");
+    }
+
+    Specialization specialization = specializationOptional.get();
+
+    // 3. Check whether the doctor has this specialization
+    boolean hasSpecialization =
+            doctor.getSpecialization().stream()
+                    .anyMatch(s -> s.getSpecializationId()
+                            .equals(specializationId));
+
+    if (!hasSpecialization) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body("The doctor does not have that specialization");
+    }
+
+    // 4. Remove only the relationship
+    doctor.getSpecialization().removeIf(
+            s -> s.getSpecializationId().equals(specializationId));
+
+    // 5. Save the doctor
+    doctorRepo.save(doctor);
+
+    return ResponseEntity.ok(
+            "Specialization removed from the doctor");
+}
+
+
           public String deleteDoctor(UUID doctorId){
 
             Optional<Doctor> doctorO=doctorRepo.findById(doctorId);
