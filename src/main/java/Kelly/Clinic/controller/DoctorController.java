@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import Kelly.Clinic.model.Doctor;
 import Kelly.Clinic.model.Office;
-
+import org.springframework.web.bind.annotation.PathVariable;
 import Kelly.Clinic.service.DoctorService;
 
 @RestController 
@@ -29,9 +29,9 @@ public class DoctorController {
         produces = MediaType.APPLICATION_JSON_VALUE
       )
 
-      public ResponseEntity<String> saveDoctor(@RequestBody Doctor doctor,@RequestParam UUID officeId,@RequestParam List<UUID> specializationId){
+      public ResponseEntity<String> saveDoctor(@RequestBody Doctor doctor,@RequestParam UUID officeId,@RequestParam List<UUID> specializationIds){
                
-           String returnedMessage=doctorService.saveDoctor(doctor,officeId,specializationId);
+           String returnedMessage=doctorService.saveDoctor(doctor,officeId,specializationIds);
            return new ResponseEntity<>(returnedMessage,HttpStatus.CREATED);
 
       }
@@ -40,11 +40,24 @@ public class DoctorController {
       produces = MediaType.APPLICATION_JSON_VALUE
     )
    
-public ResponseEntity<String> updateDoctor(@RequestBody Doctor doctor,@RequestParam UUID officeId){
-      String returnedMessage=doctorService.updateDoctor(doctor, officeId);
+public ResponseEntity<String> updateDoctor(@RequestBody Doctor doctor,@RequestParam UUID officeId ,@RequestParam List<UUID> specializationIds){
+      String returnedMessage=doctorService.updateDoctor(doctor, officeId,specializationIds);
       return new ResponseEntity<>(returnedMessage,HttpStatus.CREATED);
 }
     
+@PostMapping(
+    value = "/addSpecialization",
+    produces = MediaType.APPLICATION_JSON_VALUE
+)
+public ResponseEntity<String> addSpecializationToDoctor(
+        @RequestParam UUID doctorId,
+        @RequestParam UUID specializationId) {
+
+    return doctorService.addSpecializationToDoctor(
+            doctorId, specializationId);
+}
+
+
   @DeleteMapping (value = "/delete", consumes = MediaType.APPLICATION_JSON_VALUE,
     produces = MediaType.APPLICATION_JSON_VALUE
   )

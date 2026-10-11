@@ -1,11 +1,16 @@
 package Kelly.Clinic.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
+
 
 import Kelly.Clinic.model.Appointment;
 import Kelly.Clinic.model.Doctor;
@@ -16,6 +21,7 @@ import Kelly.Clinic.repository.AppointmentRepository;
 import Kelly.Clinic.repository.DoctorRepository;
 import Kelly.Clinic.repository.OfficeRepository;
 import Kelly.Clinic.repository.SpecializationRepository;
+
 
 @Service 
 public class DoctorService {
@@ -37,7 +43,11 @@ public class DoctorService {
               if(officeO.isPresent()){
 
                 doctor.setOffice(officeO.get());
-                
+              }
+              else{
+                return "office not found";
+              }
+
                 for(UUID specializationId:specializationIds){
                 Optional<Specialization> speci=specializationRepo.findById(specializationId);
                  if(speci.isPresent()){
@@ -49,20 +59,16 @@ public class DoctorService {
                 
               }
               
-                        doctorRepo.save(doctor);
+                doctorRepo.save(doctor);
                  return"saved successfull";
-              }
-              else{
-
-                return "id not foun";
-              }  
-            
-           
-        
+                
       }
 
-      public String updateDoctor(Doctor doctor,UUID officeId){
-         
+      public String updateDoctor(Doctor doctor,UUID officeId,List<UUID>specializationIds){
+         //System.out.println("Doctor ID: " + doctor.getDoctorId());
+    //System.out.println("Office ID: " + officeId);
+    //System.out.println("Specialization IDs: " + specializationIds);
+
         Optional<Doctor> doctorUpdate=doctorRepo.findById(doctor.getDoctorId());
            if(doctorUpdate.isPresent()){
 
@@ -72,19 +78,33 @@ public class DoctorService {
              existingDoctor.setDateOfBirth(doctor.getDateOfBirth());
 
              Optional<Office> officeOne=officeRepo.findById(officeId);
+            if(officeOne.isPresent()){
 
-             if(officeOne.isPresent()){
+            Office newOffice=officeOne.get();
 
-              Office newOffice=officeOne.get();
-
-              existingDoctor.setOffice(newOffice);
-              doctorRepo.save(existingDoctor);
-              return "updated successfull";
-             }
+            existingDoctor.setOffice(newOffice);
+            //doctorRepo.save(existingDoctor);
+            //return "updated successfull";
+            }else{
+                   return "office ot foud";
+            }
 
             
-             return "office ot foud";
+
+             List<Specialization> newSpecialization=new ArrayList<>();
+             for(UUID specializationId:specializationIds){
+              Optional<Specialization>speci=specializationRepo.findById(specializationId);
+              if(speci.isPresent()){
+                newSpecialization.add(speci.get());
+              }else{
+              return "no speci found";
+              }
+             }
+             existingDoctor.setSpecialization(newSpecialization);
+              doctorRepo.save(existingDoctor);
+              return "updated successfull ";
            }
+
             else{
 
             return "id not found";
@@ -93,6 +113,54 @@ public class DoctorService {
 
         
           }
+
+       @Transactional
+
+       public ResponseEntity<String> addSpecializationToDoctor(
+        UUID doctorId, UUID specializationId) {
+
+    
+       Optional<Doctor> doctorOptional = doctorRepo.findById(doctorId);
+
+      if (doctorOptional.isEmpty()) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body("The doctor with that id does not exist");
+                    }
+
+        Doctor doctor = doctorOptional.get();
+
+    // 2. Find the specialization
+       Optional<Specialization> specializationOptional =
+            specializationRepo.findById(specializationId);
+
+     if (specializationOptional.isEmpty()) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body("That specialization does not exist");
+    }
+
+      Specialization specialization = specializationOptional.get();
+
+    // 3. Check whether the doctor already has this specialization
+       boolean alreadyHasSpecialization =
+            doctor.getSpecialization().stream()
+                    .anyMatch(s -> s.getSpecializationId()
+                            .equals(specializationId));
+
+    if (alreadyHasSpecialization) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body("The doctor already has that specialization");
+    }
+
+    // 4. Add the specialization without removing existing ones
+    doctor.getSpecialization().add(specialization);
+
+    // 5. Save the updated doctor
+    doctorRepo.save(doctor);
+
+    // 6. Return success
+    return ResponseEntity.ok(
+            "Specialization added to the doctor");
+}
 
           public String deleteDoctor(UUID doctorId){
 

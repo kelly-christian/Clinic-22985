@@ -8,13 +8,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import Kelly.Clinic.model.Specialization;
+import Kelly.Clinic.model.Doctor;
+
 import Kelly.Clinic.repository.SpecializationRepository;
+import Kelly.Clinic.repository.DoctorRepository;
 
 @Service 
 public class SpecializationService {
 
     @Autowired 
     private SpecializationRepository specializationRepo;
+
+    @Autowired 
+    private DoctorRepository doctorRepo;
 
     public String saveSpecialization(Specialization specialization){
            specializationRepo.save(specialization);
@@ -40,6 +46,12 @@ public class SpecializationService {
         Optional<Specialization>specI=specializationRepo.findById(specializationId);
 
         if(specI.isPresent()) {
+            Specialization speci=specI.get();
+            List<Doctor> doctor=speci.getDoctor();
+            for(Doctor docT:doctor){
+                docT.setSpecialization(null);
+                doctorRepo.save(docT);
+            }
             specializationRepo.deleteById(specializationId);
             return "speci deleted success";
         }

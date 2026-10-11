@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -22,6 +24,7 @@ public class Specialization {
      private String specializationName;
 
      @ManyToMany(mappedBy = "specialization")
+	 @JsonIgnore 
      private List<Doctor> doctor = new ArrayList<>();
 
 	 public UUID getSpecializationId() {
