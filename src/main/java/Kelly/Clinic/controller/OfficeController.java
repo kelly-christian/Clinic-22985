@@ -60,5 +60,12 @@ public class OfficeController {
          List<Office> displayAll=officeService.displayAllOffice();
          return new ResponseEntity<>(displayAll,HttpStatus.CREATED);
     }
+
+    @GetMapping("/free")
+    
+    public ResponseEntity<List<Office>> getFreeOffices() {
+    List<Office> freeOffices = officeService.getFreeOffices();
+    return ResponseEntity.ok(freeOffices);
+}
     
 }

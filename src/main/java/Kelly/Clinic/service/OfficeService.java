@@ -80,5 +80,9 @@ public class OfficeService {
   return officeRepo.findAll();
  }
 
+ public List<Office> getFreeOffices() {
+    return officeRepo.findFreeOffices();
+}
+
 
 }
