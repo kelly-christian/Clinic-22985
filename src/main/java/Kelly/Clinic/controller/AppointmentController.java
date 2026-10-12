@@ -2,7 +2,9 @@ package Kelly.Clinic.controller;
 
 import java.util.List;
 import java.util.UUID;
-
+import java.sql.Date;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -32,7 +34,7 @@ public class AppointmentController {
     public ResponseEntity<String> saveAppointment(@RequestBody Appointment appointment,@RequestParam UUID doctorId,@RequestParam UUID patientId){
         
         String returnedMessage=appointmentService.saveAppointment(appointment,doctorId,patientId);
-        return new ResponseEntity<>(returnedMessage,HttpStatus.OK);
+        return new ResponseEntity<>(returnedMessage,HttpStatus.CREATED);
     }
 
  @DeleteMapping  (value = "/delete",consumes = MediaType.APPLICATION_JSON_VALUE,
@@ -77,4 +79,15 @@ public class AppointmentController {
 
         return appointmentService.getPendingAppointment();
     }
-}
+
+    @PatchMapping("/{id}/reschedule")
+       public ResponseEntity<String> rescheduleAppointment(
+        @PathVariable UUID id,
+        @RequestParam Date newDate) {
+
+        
+        String returnedMessage =appointmentService.rescheduleAppointment(id, newDate);
+
+        return new ResponseEntity<>(returnedMessage, HttpStatus.OK);
+       }
+   }

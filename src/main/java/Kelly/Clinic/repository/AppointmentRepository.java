@@ -43,5 +43,12 @@ public interface AppointmentRepository extends JpaRepository<Appointment,UUID> {
       """) 
       List<AppointmentDto>findByPendingAppointment();
 
+     
+boolean existsByDoctor_DoctorIdAndAppointmentDateAndStatusNotAndAppointmentIdNot(
+        UUID doctorId,
+        Date appointmentDate,
+        String status,
+        UUID appointmentId
+);
 
 }

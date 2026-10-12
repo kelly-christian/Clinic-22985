@@ -3,7 +3,7 @@ package Kelly.Clinic.service;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
+import java.sql.Date;
 import org.hibernate.query.sqm.sql.internal.AsWrappedExpression;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,6 +16,10 @@ import Kelly.Clinic.repository.AppointmentRepository;
 import Kelly.Clinic.repository.DoctorRepository;
 import Kelly.Clinic.repository.PatientRepository;
 import tools.jackson.databind.deser.jdk.UUIDDeserializer;
+import java.time.LocalDate;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
+import java.time.ZoneId;
 
 @Service 
 public class AppointmentService {
@@ -28,13 +32,34 @@ public class AppointmentService {
 
    public String saveAppointment(Appointment appointment,UUID doctorId,UUID patientId)
    {
+        LocalDate today = LocalDate.now();
+
+        if (appointment.getAppointmentDate() ==null) {
+        throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "Appointment date cannot be in the past"
+        );
+       }
+
+        LocalDate appointmentDay =
+        ((java.sql.Date) appointment.getAppointmentDate()).toLocalDate();
+
+    if (appointmentDay.isBefore(today)) {
+        throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "Appointment date cannot be in the past"
+        );
+    }
+
+
     Optional<Patient> getPatient=patientRepo.findById(patientId);
     Optional<Doctor> getDoctor=doctorRepo.findById(doctorId);
      
-    if(getPatient.isPresent() || getDoctor.isPresent() ){
+    if(getPatient.isPresent() && getDoctor.isPresent() ){
 
            appointment.setPatient(getPatient.get());
            appointment.setDoctor(getDoctor.get());
+           appointment.setStatus("SCHEDULED");
            appointmentRepo.save(appointment);
            return "appo saved successfull";
 
@@ -113,5 +138,70 @@ public class AppointmentService {
 
        return appointmentRepo.findByPendingAppointment();
    }
+
+
+  public String rescheduleAppointment(UUID appointmentId, Date newDate) {
+
+    Appointment appointment = appointmentRepo.findById(appointmentId)
+        .orElseThrow(() -> new ResponseStatusException(
+            HttpStatus.NOT_FOUND,
+            "The appointment with that id does not exist"
+        ));
+
+    System.out.println("Service reached after finding appointment");
+    System.out.println("Appointment status: " + appointment.getStatus());
+    System.out.println("Appointment ID: " + appointmentId);
+    System.out.println("New date: " + newDate);
+    System.out.println("Current status: " + appointment.getStatus());
+
+   
+    if ("COMPLETED".equalsIgnoreCase(appointment.getStatus())) {
+        throw new ResponseStatusException(
+            HttpStatus.BAD_REQUEST,
+            "A COMPLETED appointment cannot be rescheduled"
+        );
+    }
+
     
+    if ("CANCELLED".equalsIgnoreCase(appointment.getStatus())) {
+        throw new ResponseStatusException(
+            HttpStatus.BAD_REQUEST,
+            "A CANCELLED appointment cannot be rescheduled"
+        );
+    }
+
+    // 3. Reject null or past dates
+    if (newDate == null ||
+        newDate.toLocalDate().isBefore(LocalDate.now())) {
+        throw new ResponseStatusException(
+            HttpStatus.BAD_REQUEST,
+            "Appointment date cannot be in the past"
+        );
+    }
+
+    
+    boolean doctorIsBooked =
+        appointmentRepo
+            .existsByDoctor_DoctorIdAndAppointmentDateAndStatusNotAndAppointmentIdNot(
+                appointment.getDoctor().getDoctorId(),
+                newDate,
+                "CANCELLED",
+                appointmentId
+            );
+
+    if (doctorIsBooked) {
+        throw new ResponseStatusException(
+            HttpStatus.CONFLICT,
+            "Doctor is already booked on that date"
+        );
+    }
+
+   
+    appointment.setAppointmentDate(newDate);
+    appointment.setStatus("SCHEDULED");
+
+    appointmentRepo.save(appointment);
+
+    return "Appointment rescheduled successfully";
+}
 }
