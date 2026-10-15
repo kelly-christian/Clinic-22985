@@ -148,12 +148,6 @@ public class AppointmentService {
             "The appointment with that id does not exist"
         ));
 
-    System.out.println("Service reached after finding appointment");
-    System.out.println("Appointment status: " + appointment.getStatus());
-    System.out.println("Appointment ID: " + appointmentId);
-    System.out.println("New date: " + newDate);
-    System.out.println("Current status: " + appointment.getStatus());
-
    
     if ("COMPLETED".equalsIgnoreCase(appointment.getStatus())) {
         throw new ResponseStatusException(

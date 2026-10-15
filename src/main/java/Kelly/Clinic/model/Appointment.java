@@ -1,6 +1,8 @@
 package Kelly.Clinic.model;
 
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import jakarta.persistence.Column;
@@ -12,6 +14,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 
 @Entity 
 public class Appointment {
@@ -31,6 +34,9 @@ public class Appointment {
     @ManyToOne 
     @JoinColumn (name="doctor_id")
     private Doctor doctor;
+
+    @OneToMany (mappedBy = "appointment")
+    private List<Prescription> prescription= new ArrayList<>();
 
     public UUID getAppointmentId() {
         return appointmentId;
@@ -79,6 +85,15 @@ public class Appointment {
     public void setDoctor(Doctor doctor) {
         this.doctor = doctor;
     }
+
+    public List<Prescription> getPrescription() {
+        return prescription;
+    }
+
+    public void setPrescription(List<Prescription> prescription) {
+        this.prescription = prescription;
+    }
+
     
     
 }
