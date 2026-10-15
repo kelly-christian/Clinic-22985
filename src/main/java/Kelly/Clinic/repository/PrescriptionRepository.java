@@ -1,6 +1,7 @@
 package Kelly.Clinic.repository;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -16,6 +17,6 @@ public interface PrescriptionRepository extends JpaRepository<Prescription,UUID>
     Optional<Prescription>findByDosage(String dosage);
     Optional<Prescription>findByDurationDays(int durationDays);
     Optional<Prescription>findByIssuedDate(LocalDate issuedDate);
-    Optional<Prescription>findByAppointment_AppointmentId(UUID appointmentId);
+    List<Prescription>findByAppointment_AppointmentId(UUID appointmentId);
 
 }

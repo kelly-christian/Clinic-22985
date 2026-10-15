@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -36,6 +38,7 @@ public class Appointment {
     private Doctor doctor;
 
     @OneToMany (mappedBy = "appointment")
+    @JsonIgnore 
     private List<Prescription> prescription= new ArrayList<>();
 
     public UUID getAppointmentId() {

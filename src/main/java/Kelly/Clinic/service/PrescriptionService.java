@@ -1,6 +1,7 @@
 package Kelly.Clinic.service;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -29,14 +30,14 @@ public class PrescriptionService {
             ()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"appointment Id doesnt exist")
         );
 
-        System.out.println("Appointment status: " + appo.getStatus());
+       
 
         if(!"COMPLETED".equalsIgnoreCase(appo.getStatus())){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"prescription is for only completed appointment");
 
         }
         
-        System.out.println("Status check passed!");
+       
         prescription.setAppointment(appo);
         prescription.setIssuedDate(LocalDate.now());
         prescriptionRepo.save(prescription);
@@ -44,5 +45,11 @@ public class PrescriptionService {
 
     }   
 
+    public List<Prescription> getPrescription(UUID appointmentId){
+        Appointment appo=appointmentRepo.findById(appointmentId)
+        .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"appointment Id not found"));
+
+        return prescriptionRepo.findByAppointment_AppointmentId(appointmentId);
+    }
 
 }
