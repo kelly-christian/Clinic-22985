@@ -52,4 +52,8 @@ public class PrescriptionService {
         return prescriptionRepo.findByAppointment_AppointmentId(appointmentId);
     }
 
+    public List<Prescription>getPatientPrescription(UUID patientId){
+
+        return prescriptionRepo.findByPrescriptionBelongsToPatient(patientId);
+    }
 }

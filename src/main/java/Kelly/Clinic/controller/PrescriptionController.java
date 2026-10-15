@@ -40,4 +40,11 @@ public class PrescriptionController {
         List<Prescription>display=prescriptionService.getPrescription(appointmentId);
         return new ResponseEntity<>(display,HttpStatus.OK);
     }
+
+    @GetMapping (value = "/patient/{patientId}")
+
+    public ResponseEntity<List<Prescription>>getPatientPrescription(@PathVariable UUID patientId){
+        List<Prescription>display=prescriptionService.getPatientPrescription(patientId);
+        return new ResponseEntity<>(display,HttpStatus.OK);
+    }
 }
