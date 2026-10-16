@@ -14,7 +14,7 @@ import jakarta.persistence.ManyToOne;
 public class Prescription {
     @Id 
     @GeneratedValue (strategy =GenerationType.UUID)
-    private UUID PrescriptionId;
+    private UUID prescriptionId;
     private String medicineName;
     private String dosage;
     private int durationDays;
@@ -25,11 +25,11 @@ public class Prescription {
     private Appointment appointment;
 
     public UUID getPrescriptionId() {
-        return PrescriptionId;
+        return prescriptionId;
     }
 
     public void setPrescriptionId(UUID prescriptionId) {
-        PrescriptionId = prescriptionId;
+        this.prescriptionId = prescriptionId;
     }
 
     public String getMedicineName() {
@@ -71,6 +71,8 @@ public class Prescription {
     public void setAppointment(Appointment appointment) {
         this.appointment = appointment;
     }
+
+    
 
     
 

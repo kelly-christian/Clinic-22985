@@ -15,6 +15,7 @@ import Kelly.Clinic.model.Patient;
 import Kelly.Clinic.repository.AppointmentRepository;
 import Kelly.Clinic.repository.DoctorRepository;
 import Kelly.Clinic.repository.PatientRepository;
+import Kelly.Clinic.repository.PrescriptionRepository;
 import tools.jackson.databind.deser.jdk.UUIDDeserializer;
 import java.time.LocalDate;
 import org.springframework.http.HttpStatus;
@@ -29,6 +30,8 @@ public class AppointmentService {
    private PatientRepository patientRepo;
    @Autowired 
    private DoctorRepository doctorRepo;
+   @Autowired 
+   private PrescriptionRepository prescriptionRepo;
 
    public String saveAppointment(Appointment appointment,UUID doctorId,UUID patientId)
    {
@@ -73,7 +76,10 @@ public class AppointmentService {
    public String deleteAppointment(UUID appointmentId){
       
        Optional<Appointment>appo=appointmentRepo.findById(appointmentId);
-       if(appo.isPresent()){
+       if(appo.isEmpty()){
+
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND,"appointment Id not found");
+       }
 
               Appointment appoO=appo.get();
               Doctor doctorO=appoO.getDoctor();
@@ -87,15 +93,19 @@ public class AppointmentService {
                      patientRepo.save(patientO);
                      
               }
+             
+              Boolean hasPrescription=prescriptionRepo.existsByAppointment_AppointmentId(appointmentId);
+              
+              if(hasPrescription){
+
+                throw new ResponseStatusException(HttpStatus.CONFLICT,"the appointment has prescription first remove prescription");
+              }
+              
               appointmentRepo.deleteById(appointmentId);
               return "appo deleted successfull";
 
        }
-       else{
-              return "id not found";
-       }
-
-   }
+       
 
    public String updateAppointment(Appointment appointment,UUID doctorId,UUID patientId){
        Optional<Appointment> updateAppo=appointmentRepo.findById(appointment.getAppointmentId());
@@ -198,4 +208,5 @@ public class AppointmentService {
 
     return "Appointment rescheduled successfully";
 }
+
 }

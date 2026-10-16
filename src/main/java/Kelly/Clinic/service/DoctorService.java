@@ -257,9 +257,9 @@ public ResponseEntity<String> removeSpecializationFromDoctor(
 
 
 
-          public String deleteDoctor(UUID doctorId){
+public String deleteDoctor(UUID doctorId){
 
-            Optional<Doctor> doctorO=doctorRepo.findById(doctorId);
+     Optional<Doctor> doctorO=doctorRepo.findById(doctorId);
              
             if(doctorO.isPresent()){
 

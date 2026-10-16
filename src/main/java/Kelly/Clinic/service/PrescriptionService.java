@@ -56,4 +56,33 @@ public class PrescriptionService {
 
         return prescriptionRepo.findByPrescriptionBelongsToPatient(patientId);
     }
+
+    public String updatePrescription(Prescription prescription,UUID prescriptionId){
+         
+        Optional<Prescription>pre=prescriptionRepo.findById(prescriptionId);
+        if(pre.isEmpty()){
+           throw new ResponseStatusException(HttpStatus.NOT_FOUND,"prescription Id not found");
+        }
+        Prescription existingPrescription=pre.get();
+            existingPrescription.setMedicineName(prescription.getMedicineName());
+            existingPrescription.setDosage(prescription.getDosage());
+            existingPrescription.setDurationDays(prescription.getDurationDays());
+
+            prescriptionRepo.save(existingPrescription);
+            return "prescription updated successfull";
+
+    }
+
+    public String deletePrescription(Prescription prescription,UUID prescriptionId){
+ 
+           Optional<Prescription>pre=prescriptionRepo.findById(prescriptionId);
+
+           if(pre.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"prescription ID not found");
+
+           }
+
+           prescriptionRepo.delete(pre.get());
+           return "prescription deleted successfull";
+    }
 }

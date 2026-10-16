@@ -20,7 +20,7 @@ public interface PrescriptionRepository extends JpaRepository<Prescription,UUID>
     Optional<Prescription>findByDurationDays(int durationDays);
     Optional<Prescription>findByIssuedDate(LocalDate issuedDate);
     List<Prescription>findByAppointment_AppointmentId(UUID appointmentId);
-
+    Boolean existsByAppointment_AppointmentId(UUID appointmentId);
     @Query("""
             SELECT p FROM Prescription p
             JOIN p.appointment a
